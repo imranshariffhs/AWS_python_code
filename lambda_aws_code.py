@@ -3,6 +3,9 @@ import zipfile
 import os
 import shutil
 from pathlib import Path
+import pandas as pd
+import json
+import numpy as np
 
 # S3 client
 s3 = boto3.client('s3')
@@ -149,23 +152,6 @@ def lambda_handler(event, context):
         local_zip_path, extract_dir = None, None
         if key.endswith(".zip"):
             print(f"Processing {key}")
-<<<<<<< Updated upstream
-            print(f'Folder Name {key.split("/")[1].split(".")[0]}')
-            zip_new_name=key.split("/")[1].split(".")[0]
-            zip_check = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix=zip_new_name, MaxKeys=1)
-            
-            if 'Contents' not in zip_check:
-                s3.put_object(Bucket=BUCKET_NAME, Key=zip_new_name)
-                print(f"Folder '{zip_new_name}' created in S3 bucket '{BUCKET_NAME}'.")
-            else:
-                print(f"Folder '{zip_new_name}' already exists in S3.")
-            
-            data[key] = []
-
-            # Local paths
-            local_zip_path = f"/{zip_new_name}/{os.path.basename(key)}"
-            extract_dir = f"/{zip_new_name}/{os.path.splitext(os.path.basename(key))[0]}"
-=======
             print(f'Folder Name {key.split("/")[1].split(".")[0]}')            
             data[key] = []
 
@@ -191,7 +177,6 @@ def lambda_handler(event, context):
             cleanup_local_directory(extract_dir)
             
             # Create extraction directory
->>>>>>> Stashed changes
             os.makedirs(extract_dir, exist_ok=True)
             
             # Download and extract ZIP file
