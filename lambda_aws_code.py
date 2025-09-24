@@ -34,11 +34,21 @@ def lambda_handler(event, context):
         key = obj['Key']
         if key.endswith(".zip"):
             print(f"Processing {key}")
+            print(f'Folder Name {key.split("/")[1].split(".")[0]}')
+            zip_new_name=key.split("/")[1].split(".")[0]
+            zip_check = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix=zip_new_name, MaxKeys=1)
+            
+            if 'Contents' not in zip_check:
+                s3.put_object(Bucket=BUCKET_NAME, Key=zip_new_name)
+                print(f"Folder '{zip_new_name}' created in S3 bucket '{BUCKET_NAME}'.")
+            else:
+                print(f"Folder '{zip_new_name}' already exists in S3.")
+            
             data[key] = []
 
             # Local paths
-            local_zip_path = f"/tmp/{os.path.basename(key)}"
-            extract_dir = f"/tmp/{os.path.splitext(os.path.basename(key))[0]}"
+            local_zip_path = f"/{zip_new_name}/{os.path.basename(key)}"
+            extract_dir = f"/{zip_new_name}/{os.path.splitext(os.path.basename(key))[0]}"
             os.makedirs(extract_dir, exist_ok=True)
 
             # Download the zip file
